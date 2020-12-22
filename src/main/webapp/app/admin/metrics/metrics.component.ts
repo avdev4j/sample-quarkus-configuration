@@ -21,25 +21,20 @@ export class MetricsComponent implements OnInit {
 
   refresh(): void {
     this.updatingMetrics = true;
-    this.metricsService.getMetrics().subscribe(metrics => {
-      this.metrics = metrics;
-      this.updatingMetrics = false;
-      this.changeDetector.detectChanges();
-    });
-    /*
-        .pipe(
-          flatMap(
-            () => this.metricsService.threadDump(),
-            (metrics: Metrics, threadDump: ThreadDump) => {
-              this.metrics = metrics;
-              this.threads = threadDump.threads;
-              this.updatingMetrics = false;
-              this.changeDetector.detectChanges();
-            }
-          )
+    this.metricsService
+      .getMetrics()
+      .pipe(
+        flatMap(
+          () => this.metricsService.threadDump(),
+          (metrics: Metrics, threadDump: ThreadDump) => {
+            this.metrics = metrics;
+            this.threads = threadDump.threads;
+            this.updatingMetrics = false;
+            this.changeDetector.detectChanges();
+          }
         )
-        .subscribe();
-        */
+      )
+      .subscribe();
   }
 
   metricsKeyExists(key: MetricsKey): boolean {
