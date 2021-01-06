@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { flatMap } from 'rxjs/operators';
 
-import { MetricsService, Metrics, MetricsKey, ThreadDump, Thread } from './metrics.service';
+import { MetricsService, Metrics, MetricsKey } from './metrics.service';
 
 @Component({
   selector: 'jhi-metrics',
@@ -10,7 +9,6 @@ import { MetricsService, Metrics, MetricsKey, ThreadDump, Thread } from './metri
 })
 export class MetricsComponent implements OnInit {
   metrics?: Metrics;
-  threads?: Thread[];
   updatingMetrics = true;
 
   constructor(private metricsService: MetricsService, private changeDetector: ChangeDetectorRef) {}
@@ -21,20 +19,11 @@ export class MetricsComponent implements OnInit {
 
   refresh(): void {
     this.updatingMetrics = true;
-    this.metricsService
-      .getMetrics()
-      .pipe(
-        flatMap(
-          () => this.metricsService.threadDump(),
-          (metrics: Metrics, threadDump: ThreadDump) => {
-            this.metrics = metrics;
-            this.threads = threadDump.threads;
-            this.updatingMetrics = false;
-            this.changeDetector.detectChanges();
-          }
-        )
-      )
-      .subscribe();
+    this.metricsService.getMetrics().subscribe(metrics => {
+      this.metrics = metrics;
+      this.updatingMetrics = false;
+      this.changeDetector.detectChanges();
+    });
   }
 
   metricsKeyExists(key: MetricsKey): boolean {
